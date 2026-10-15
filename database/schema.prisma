@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+model Tenant {
+  id String @id @default(uuid()) @db.Uuid
+  legalName String
+  name String
+  cnpj String @unique
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz
+  units Unit[]
+  memberships Membership[]
+  @@map("tenants")
+}
+model Unit {
+  id String @id @default(uuid()) @db.Uuid
+  tenantId String @db.Uuid
+  name String
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  scopes UnitScope[]
+  @@unique([tenantId, id])
+  @@unique([tenantId, name])
+  @@map("units")
+}
+model Membership {
+  id String @id @default(uuid()) @db.Uuid
+  tenantId String @db.Uuid
+  userId String
+  displayName String
+  role String
+  active Boolean @default(true)
+  allUnits Boolean @default(false)
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  scopes UnitScope[]
+  @@unique([tenantId, userId])
+  @@unique([tenantId, id])
+  @@map("memberships")
+}
+model UnitScope {
+  tenantId String @db.Uuid
+  membershipId String @db.Uuid
+  unitId String @db.Uuid
+  membership Membership @relation(fields: [tenantId, membershipId], references: [tenantId, id], onDelete: Restrict)
+  unit Unit @relation(fields: [tenantId, unitId], references: [tenantId, id], onDelete: Restrict)
+  @@id([tenantId, membershipId, unitId])
+  @@map("unit_scopes")
+}
+model Session {
+  hash String @id
+  userId String
+  displayName String
+  csrf String
+  mfa Boolean
+  expiresAt DateTime @db.Timestamptz
+  idleExpiresAt DateTime @db.Timestamptz
+  createdAt DateTime @default(now()) @db.Timestamptz
+  @@index([expiresAt])
+  @@map("sessions")
+}
+model LoginAttempt {
+  hash String @id
+  state String
+  nonce String
+  verifier String
+  expiresAt DateTime @db.Timestamptz
+  @@map("login_attempts")
+}
+model AuditEvent {
+  id String @id @default(uuid()) @db.Uuid
+  tenantId String @db.Uuid
+  actor String
+  action String
+  resource String
+  resourceId String
+  payload Json
+  hash String
+  createdAt DateTime @default(now()) @db.Timestamptz
+  @@index([tenantId, createdAt])
+  @@map("audit_events")
+}
