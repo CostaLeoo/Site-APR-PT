@@ -60,6 +60,8 @@ Relatório e limites: [verificação da entrega](docs/operations/verificacao.md)
 
 ## Documentação
 
+Deploy na Vercel: [configuração de Services, variáveis e publicação](docs/operations/vercel.md).
+
 1. [Visão](docs/product/01-visao.md)
 2. [Pesquisa e matriz normativa](docs/compliance/10-matriz-normativa.md)
 3. [Requisitos](docs/product/02-requisitos.md)

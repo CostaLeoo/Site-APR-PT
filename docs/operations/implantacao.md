@@ -4,6 +4,8 @@ Esta entrega não foi implantada em nuvem. Docker Compose usa modo de desenvolvi
 
 ## Preparação
 
+Para Vercel, seguir o [guia específico de Services](vercel.md). Os passos de Docker e proxy interno abaixo se aplicam à alternativa de hospedagem em containers.
+
 - Construir a imagem com `docker build -t vigia:homolog .`; Dockerfile não foi executado neste ambiente sem Docker.
 - Rodar API e web como serviços separados; a imagem padrão inicia API. Para web, sobrescrever comando para `npm run start -w @apr/web`.
 - Injetar configuração por secret manager. Não copiar `.env` da estação nem `.local` para imagens.

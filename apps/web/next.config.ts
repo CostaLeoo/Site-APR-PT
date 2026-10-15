@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 const config: NextConfig = {
   poweredByHeader: false,
   async rewrites() {
+    if (process.env.VERCEL_SERVICES_ROUTING === "true") return [];
     const target = process.env.API_INTERNAL_ORIGIN ?? "http://127.0.0.1:4000";
     return [
       { source: "/v1/:path*", destination: `${target}/v1/:path*` },

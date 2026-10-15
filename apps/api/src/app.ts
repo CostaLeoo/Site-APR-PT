@@ -14,6 +14,7 @@ import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import express, { Request, Response, NextFunction } from "express";
 import { randomUUID } from "node:crypto";
+import { clientIp } from "./client-ip";
 import { Config } from "./config";
 import { Database } from "./database";
 import { AuthService, digest } from "./auth";
@@ -130,7 +131,7 @@ export async function createApp(
       const key = digest(
         session
           ? `user:${session.userId}|api`
-          : `${req.socket.remoteAddress}|${req.path.startsWith("/auth") ? "auth" : "api"}`,
+          : `${clientIp(req)}|${req.path.startsWith("/auth") ? "auth" : "api"}`,
       );
       const [limit] = await db.client.$queryRaw<{ hits: number }[]>`
         INSERT INTO request_limits(key,hits,"resetAt") VALUES(${key},1,now()+interval '1 minute')

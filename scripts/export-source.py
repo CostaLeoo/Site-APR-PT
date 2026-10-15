@@ -7,10 +7,10 @@ ROOT = Path(__file__).resolve().parent.parent
 ROOT_FILES = {
     'README.md', 'package.json', 'package-lock.json', 'tsconfig.json',
     'playwright.config.ts', 'compose.yaml', 'Dockerfile', '.gitignore',
-    '.gitattributes', '.dockerignore', '.prettierignore', '.env.example',
+    '.gitattributes', '.dockerignore', '.prettierignore', '.env.example', 'vercel.json', '.vercelignore',
 }
 DIRECTORIES = ('apps', 'database', 'docs', 'infra', 'scripts', 'tests', '.github')
-EXCLUDED = {'node_modules', '.next', 'dist', '.local', '.git', '__pycache__', 'test-results', 'playwright-report', 'coverage'}
+EXCLUDED = {'node_modules', '.next', 'dist', '.local', '.git', '.vercel', '__pycache__', 'test-results', 'playwright-report', 'coverage'}
 
 
 def eligible(path: Path) -> bool:

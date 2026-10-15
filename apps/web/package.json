@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev --hostname 127.0.0.1",
     "build": "next build",
+    "build:vercel": "node ../../scripts/build-vercel-web.mjs",
     "start": "next start --hostname 0.0.0.0"
   },
   "dependencies": {
