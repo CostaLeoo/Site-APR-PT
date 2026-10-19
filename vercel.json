@@ -4,21 +4,41 @@
     "web": {
       "root": "apps/web",
       "framework": "nextjs",
-      "installCommand": "npm ci --include=dev",
+      "installCommand": "npm ci --include=dev --workspaces --include-workspace-root",
       "buildCommand": "npm run build:vercel"
     },
     "api": {
       "root": "apps/api",
       "framework": "nestjs",
-      "installCommand": "npm ci --include=dev",
+      "installCommand": "npm ci --include=dev --workspaces --include-workspace-root",
       "entrypoint": "src/main.ts",
       "buildCommand": "npm run build:vercel"
     }
   },
   "rewrites": [
-    { "source": "/auth/:path*", "destination": { "service": "api" } },
-    { "source": "/v1/:path*", "destination": { "service": "api" } },
-    { "source": "/health/:path*", "destination": { "service": "api" } },
-    { "source": "/:path*", "destination": { "service": "web" } }
+    {
+      "source": "/auth/:path*",
+      "destination": {
+        "service": "api"
+      }
+    },
+    {
+      "source": "/v1/:path*",
+      "destination": {
+        "service": "api"
+      }
+    },
+    {
+      "source": "/health/:path*",
+      "destination": {
+        "service": "api"
+      }
+    },
+    {
+      "source": "/:path*",
+      "destination": {
+        "service": "web"
+      }
+    }
   ]
 }
