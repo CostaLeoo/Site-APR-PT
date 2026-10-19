@@ -82,6 +82,10 @@ Para homologação, usar domínio estável de staging, banco separado, outro cli
 
 ## Verificação após publicar
 
+### Arquivo ausente depois de Build Completed
+
+Se a publicação falhar com `ENOENT ... node_modules/@swc/helpers/...`, conferir também `.vercelignore`. Ele não deve excluir `node_modules`, `.next` ou `dist`: algumas versões do empacotador reaplicam essas regras às referências `filePathMap` de arquivos necessários em runtime. O arquivo foi restringido a segredos e pastas locais, com caminhos ancorados onde apropriado. `.gitignore` e o exportador continuam impedindo o envio de dependências e builds ao GitHub. A proteção de `.env` foi mantida; somente o modelo `.env.example` pode ser enviado. Essa correção trata uma causa documentada compatível com a falha observada, mas a confirmação depende do deploy remoto. Referência: [Vercel issue 17386](https://github.com/vercel/vercel/issues/17386).
+
 - `/` e `/demonstracao` devem carregar com assets `/_next/*` sem erro.
 - `/health/ready` deve responder 200; `/v1/me` sem sessão deve responder 401, nunca HTML do Next.
 - Login pelo domínio canônico deve voltar ao mesmo domínio, manter cookies Secure/HttpOnly e abrir `/painel`; validar MFA de perfis privilegiados e logout.

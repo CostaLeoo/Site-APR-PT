@@ -1,13 +1,11 @@
-.git
-.local
-.env
-.env.*
-node_modules
-**/node_modules
-**/.next
-**/dist
-**/*.tsbuildinfo
-test-results
-playwright-report
-coverage
-**/*.log
+# Do not exclude node_modules, .next or dist here: Vercel may apply
+# these rules to runtime filePathMap entries after a successful build.
+# Git and the source exporter already exclude generated dependencies.
+/.git/
+/.local/
+**/.env
+**/.env.*
+!**/.env.example
+/test-results/
+/playwright-report/
+/coverage/
