@@ -19,6 +19,20 @@ Na configuração atual, as rotas do gateway preservam o caminho original e a qu
 
 ## Configuração na Vercel
 
+### Correção do erro EUSAGE na instalação
+
+O monorepo usa npm Workspaces (`apps/*`) e um único `package-lock.json` versão 3 na raiz. Os manifests dos dois serviços estão registrados nesse lockfile; não criar lockfiles independentes nas subpastas. O gerenciador está identificado como `npm@11.19.0` no `package.json`.
+
+A configuração anterior usava `npm ci --prefix ../..`. Esse caminho é relativo ao diretório de execução, não ao campo `root` do serviço. Quando a instalação parte da raiz do checkout, o prefixo aponta para fora do repositório, onde não existe lockfile, causando EUSAGE. Esse comportamento foi reproduzido localmente mesmo com o lockfile presente na raiz. O trecho do erro remoto não informa o diretório de execução nem os arquivos do commit; portanto, ele sozinho não comprova que o lockfile estava no GitHub. Conferir ambos ao republicar.
+
+Os dois Services agora executam **`npm ci --include=dev`**, sem prefixo: o npm resolve a raiz do workspace, tanto a partir da raiz quanto das pastas `apps/web` e `apps/api`. `--include=dev` mantém TypeScript, Prisma e outras ferramentas de build disponíveis mesmo com NODE_ENV=production. Não há fallback para `npm install`. O prefixo no script de build da API permanece válido: scripts npm rodam no diretório do pacote, portanto ali o caminho da raiz é conhecido.
+
+O lockfile não está bloqueado por `.gitignore` ou `.vercelignore`. O exportador exige a presença dos manifests, do lockfile e de `vercel.json`, e confere as dependências dos três manifests contra o lockfile antes de gerar o ZIP.
+
+Validação em 19/10/2026: cópia de fontes sem `.env` e sem dependências prévias instalada com `npm ci --include=dev` (260 pacotes). Os builds `build:vercel` da API e web passaram nessa cópia, assim como os 30 testes automatizados de autenticação, CSRF, MFA e isolamento multiempresa. O comando de instalação também foi verificado em modo dry-run a partir de cada workspace; ambos resolveram o lockfile da raiz. A demonstração e o formulário APR foram exercitados no Chromium com apenas o servidor de produção Next.js, sem API, PostgreSQL ou OIDC, sem chamadas a `/v1` ou `/auth` e sem erros de JavaScript. Nenhum código funcional ou regra de autenticação foi alterado nesta correção. A confirmação do deploy Linux continua dependendo da próxima execução na Vercel.
+
+Para atualizar um repositório existente, enviar **o conteúdo** de `.local/github-upload-vercel` à raiz do repositório, substituindo os arquivos anteriores; não criar uma pasta `github-upload-vercel` dentro dele. Confirmar no GitHub que `package.json`, `package-lock.json`, `vercel.json` e `apps/` aparecem no mesmo nível. Na Vercel, manter Root Directory `.` e remover overrides antigos de instalação no painel. Depois publicar o commit atualizado sem reutilizar o cache de build da tentativa anterior.
+
 1. Enviar os arquivos atualizados ao GitHub, incluindo `vercel.json`, `.vercelignore`, os dois `package.json`, scripts e código. A cópia em `.local/github-upload-vercel` contém a exportação atualizada, sem dependências e segredos.
 2. Importar o repositório como **um projeto**, com **Root Directory = raiz (`.`)**. Usar a configuração Services do arquivo. Remover da seleção automática o serviço Container da raiz; os únicos serviços devem ser `web` e `api`.
 3. Selecionar Node.js **24.x**. Não substituir os comandos de build/install do arquivo por um build global nem definir uma pasta de saída global. Cada serviço instala o workspace com o lockfile da raiz. A API gera o Prisma antes de compilar; o web usa `build:vercel`.
@@ -84,3 +98,5 @@ Verificações locais em 15/10/2026: `build:vercel` da API (incluindo geração 
 - [Roteamento e preservação de caminhos](https://vercel.com/docs/services/routing)
 - [NestJS na Vercel](https://vercel.com/docs/frameworks/backend/nestjs)
 - [Cabeçalhos confiáveis da Vercel](https://vercel.com/docs/headers/request-headers)
+
+Na sincronização com o GitHub, foram preservados os ajustes de dependências já presentes em main (Prisma no pacote raiz e TypeScript no workspace web), junto com o lockfile correspondente.

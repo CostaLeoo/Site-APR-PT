@@ -23,6 +23,21 @@ def eligible(path: Path) -> bool:
 
 
 def main():
+    # Fail closed: a missing lockfile must never produce an apparently deployable ZIP.
+    required = ('package.json', 'package-lock.json', 'vercel.json',
+                'apps/web/package.json', 'apps/api/package.json')
+    for name in required:
+        if not eligible(ROOT / name):
+            raise ValueError(f'Arquivo obrigatório ausente ou inseguro: {name}')
+    lock = json.loads((ROOT / 'package-lock.json').read_text(encoding='utf-8'))
+    if lock.get('lockfileVersion') != 3:
+        raise ValueError('Esperado package-lock.json npm versão 3')
+    for workspace in ('', 'apps/web', 'apps/api'):
+        manifest = json.loads((ROOT / workspace / 'package.json').read_text(encoding='utf-8'))
+        locked = lock.get('packages', {}).get(workspace, {})
+        for field in ('name', 'version', 'dependencies', 'devDependencies', 'workspaces'):
+            if manifest.get(field) != locked.get(field):
+                raise ValueError(f'Lockfile divergente: {workspace or "raiz"} / {field}')
     files = [ROOT / name for name in ROOT_FILES if (ROOT / name).is_file()]
     for folder in DIRECTORIES:
         base = ROOT / folder

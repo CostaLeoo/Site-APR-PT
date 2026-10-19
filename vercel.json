@@ -4,11 +4,13 @@
     "web": {
       "root": "apps/web",
       "framework": "nextjs",
+      "installCommand": "npm ci --include=dev",
       "buildCommand": "npm run build:vercel"
     },
     "api": {
       "root": "apps/api",
       "framework": "nestjs",
+      "installCommand": "npm ci --include=dev",
       "entrypoint": "src/main.ts",
       "buildCommand": "npm run build:vercel"
     }
