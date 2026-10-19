@@ -2,8 +2,8 @@ import "reflect-metadata";
 import {
   Module,
   Catch,
-  ExceptionFilter,
-  ArgumentsHost,
+  type ExceptionFilter,
+  type ArgumentsHost,
   HttpException,
 } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
@@ -12,10 +12,10 @@ import { ZodError } from "zod";
 import { Prisma } from "@prisma/client";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
-import express, { Request, Response, NextFunction } from "express";
+import express, { type Request, type Response, type NextFunction } from "express";
 import { randomUUID } from "node:crypto";
 import { clientIp } from "./client-ip";
-import { Config } from "./config";
+import type { Config } from "./config";
 import { Database } from "./database";
 import { AuthService, digest } from "./auth";
 import {

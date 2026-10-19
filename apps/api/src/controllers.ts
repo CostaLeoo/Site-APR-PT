@@ -16,13 +16,13 @@ import {
 import { ApiOperation, ApiTags, ApiCookieAuth } from "@nestjs/swagger";
 import { z } from "zod";
 import type { Request, Response } from "express";
-import { Database, Tx } from "./database";
-import { AuthRequest, AuthService } from "./auth";
+import { Database, type Tx } from "./database";
+import { type AuthRequest, AuthService } from "./auth";
 import {
   requirePermission,
   roleSchema,
   permissions,
-  Role,
+  type Role,
   canAccessUnit,
 } from "./policy";
 const uuid = z.uuid();
